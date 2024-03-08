@@ -1,11 +1,15 @@
 import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
 import { NextRequest, NextResponse } from 'next/server';
 import { NEXT_PUBLIC_URL, API_URL } from '../../config';
+import { getData } from '../../utils/firebase'
 //const API_URL = "https://zizzamia.xyz"
 
 async function getResponse(req: NextRequest): Promise<NextResponse> {
     const body: FrameRequest = await req.json();
-    const { isValid, message } = await getFrameMessage(body, { neynarApiKey: 'NEYNAR_ONCHAIN_KIT' });
+    const { isValid, message } = await getFrameMessage(body, { neynarApiKey: 'NEYNAR_ONCHAIN_KIT', allowFramegear: true });
+
+    let status = await getData()
+    console.log(status)
 
     if (!isValid) {
         return new NextResponse("Message not valid", { status: 500 });
@@ -15,11 +19,13 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     let state = {
         page: 0
     };
+
+    /*
     try {
         state = JSON.parse(decodeURIComponent(message.state?.serialized));
     } catch (e) {
         console.error(e);
-    }
+    }*/
 
     /**
      * Use this code to redirect to a different page
@@ -37,7 +43,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         getFrameHtmlResponse({
             buttons: [
                 {
-                    label: `👁️`,
+                    label: `👁️ ${status.isRacing}`,
                 },
                 {
                     action: 'link',
@@ -51,7 +57,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
                 },*/
             ],
             image: {
-                src: `${NEXT_PUBLIC_URL}/w3bbie${(state?.page % 2) + 1}.jpg`,
+                src: `${NEXT_PUBLIC_URL}/home.png`,
             },
             postUrl: `${API_URL}/api/frame`,
             state: {

@@ -43,6 +43,8 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
                 break;
         }
     }
+
+    return getBetFrame(state, raceInfo, text)
 }
 
 export async function POST(req: NextRequest): Promise<Response> {

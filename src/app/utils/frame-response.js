@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
 import { NEXT_PUBLIC_URL, API_URL } from '../config';
 
-export const getBetFrame = (state, raceInfo) => {
+export const getBetFrame = (state, raceInfo, text) => {
     let { isRacing, raceState } = raceInfo
     return new NextResponse(
         getFrameHtmlResponse({
@@ -20,7 +20,7 @@ export const getBetFrame = (state, raceInfo) => {
                     target: 'https://w3bbie.xyz',
                 },
                 {
-                    label: `> ${state?.time} - ${state?.page}  <`,
+                    label: `${text}`,
                 },
             ],
             input: {

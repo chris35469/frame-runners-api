@@ -21,28 +21,14 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         time: Date.now()
     };
 
-
     try {
         state = JSON.parse(decodeURIComponent(message.state?.serialized));
         console.log(state)
     } catch (e) {
         console.log("error parsing")
-        //console.error(e);
     }
 
-    /**
-     * Use this code to redirect to a different page
-     */
-    /*
-    if (message?.button === 3) {
-      return NextResponse.redirect(
-        'https://www.google.com/search?q=cute+dog+pictures&tbm=isch&source=lnms',
-        { status: 302 },
-      );
-    }
-    */
-
-    return getBetFrame(state, raceInfo)
+    return getBetFrame(state, raceInfo, text)
 }
 
 export async function POST(req: NextRequest): Promise<Response> {

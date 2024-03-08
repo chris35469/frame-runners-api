@@ -2,7 +2,7 @@ import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/o
 import { NextRequest, NextResponse } from 'next/server';
 import { NEXT_PUBLIC_URL, API_URL } from '../../config';
 import { getData } from '../../utils/firebase'
-import { getBetFrame, getRacingFrame } from '../../utils/frame-response'
+import { getBetFrame, getRacingFrame, getWaitingFrame } from '../../utils/frame-response'
 //const API_URL = "https://zizzamia.xyz"
 
 async function getResponse(req: NextRequest): Promise<NextResponse> {
@@ -39,6 +39,8 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
             return getBetFrame(state, raceInfo, text)
         case "1":
             return getRacingFrame(state, raceInfo)
+        case "2":
+            return getWaitingFrame(state, raceInfo)
         default:
             break;
     }

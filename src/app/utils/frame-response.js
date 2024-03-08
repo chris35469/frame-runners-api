@@ -8,6 +8,7 @@ export const getBetFrame = (state, raceInfo) => {
         getFrameHtmlResponse({
             image: {
                 src: `${NEXT_PUBLIC_URL}/bet.png`,
+                aspectRatio: '1:1',
             },
             buttons: [
                 {

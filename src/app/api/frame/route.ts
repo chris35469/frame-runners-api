@@ -32,16 +32,15 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     text = `${text} - ${state?.page}`
 
     let { isRacing, raceState } = raceInfo
-    if (state?.page == 0) {
-        // After First page check race state
-        switch (raceState) {
-            case 0:
-                return getBetFrame(state, raceInfo, text)
-            case 1:
-                return getRacingFrame(state, raceInfo)
-            default:
-                break;
-        }
+
+    // After First page check race state
+    switch (raceState) {
+        case 0:
+            return getBetFrame(state, raceInfo, text)
+        case 1:
+            return getRacingFrame(state, raceInfo)
+        default:
+            break;
     }
 
     return getBetFrame(state, raceInfo, text)

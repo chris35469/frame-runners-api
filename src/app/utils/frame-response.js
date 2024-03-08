@@ -24,7 +24,7 @@ export const getBetFrame = (state, raceInfo, text) => {
                 },
             ],
             input: {
-                text: 'What is the password?',
+                text: 'Select a Horse Number (1-10)',
             },
             postUrl: `${API_URL}/api/frame`,
             state: {

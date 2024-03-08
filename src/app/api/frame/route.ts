@@ -15,10 +15,11 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         return new NextResponse("Message not valid", { status: 500 });
     }
 
-    const text = message.input || '';
+    let text = message.input || '';
     let state = {
         page: 0,
-        time: Date.now()
+        time: Date.now(),
+        _state: "",
     };
 
     try {
@@ -28,6 +29,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         console.log("error parsing")
     }
 
+    text = `${text} - ${state?.page}`
     return getBetFrame(state, raceInfo, text)
 }
 

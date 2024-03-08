@@ -8,8 +8,8 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     const body: FrameRequest = await req.json();
     const { isValid, message } = await getFrameMessage(body, { neynarApiKey: 'NEYNAR_ONCHAIN_KIT', allowFramegear: true });
 
-    let { status, isRacing } = await getData()
-    console.log(status)
+    let { raceState, isRacing } = await getData()
+    console.log(raceState)
 
     if (!isValid) {
         return new NextResponse("Message not valid", { status: 500 });
@@ -43,7 +43,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         getFrameHtmlResponse({
             buttons: [
                 {
-                    label: `👁️ ${isRacing} - ${state}`,
+                    label: `👁️ ${isRacing} - ${raceState}`,
                 },
                 {
                     action: 'link',

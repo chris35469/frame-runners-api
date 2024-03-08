@@ -34,3 +34,31 @@ export const getBetFrame = (state, raceInfo, text) => {
         }),
     );
 }
+
+export const getRacingFrame = (state, raceInfo) => {
+    let { isRacing, raceState } = raceInfo
+    return new NextResponse(
+        getFrameHtmlResponse({
+            image: {
+                src: `${NEXT_PUBLIC_URL}/racing.png`,
+                aspectRatio: '1:1',
+            },
+            buttons: [
+                {
+                    label: `update`,
+                },
+                {
+                    action: 'link',
+                    label: 'w3bbie.xyz',
+                    target: 'https://w3bbie.xyz',
+                },
+            ],
+            postUrl: `${API_URL}/api/frame`,
+            state: {
+                page: state?.page + 1,
+                time: Date.now(),
+            }
+        }),
+    );
+}
+

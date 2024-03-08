@@ -35,9 +35,9 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
 
     // After First page check race state
     switch (raceState) {
-        case 0:
+        case "0":
             return getBetFrame(state, raceInfo, text)
-        case 1:
+        case "1":
             return getRacingFrame(state, raceInfo)
         default:
             break;

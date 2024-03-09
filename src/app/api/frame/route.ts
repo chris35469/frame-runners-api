@@ -41,7 +41,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         case "1":
             return getRacingFrame(state, raceInfo)
         case "2":
-            return getWaitingFrame(state, raceInfo)
+            return getWaitingFrame(state, raceInfo, text)
         default:
             break;
     }

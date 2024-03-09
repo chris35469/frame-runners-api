@@ -62,7 +62,7 @@ export const getRacingFrame = (state, raceInfo) => {
     );
 }
 
-export const getWaitingFrame = (state, raceInfo) => {
+export const getWaitingFrame = (state, raceInfo, text) => {
     let { isRacing, raceState } = raceInfo
     return new NextResponse(
         getFrameHtmlResponse({
@@ -72,7 +72,7 @@ export const getWaitingFrame = (state, raceInfo) => {
             },
             buttons: [
                 {
-                    label: `update`,
+                    label: `update - ${text}`,
                 },
                 {
                     action: 'link',

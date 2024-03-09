@@ -15,19 +15,20 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         return new NextResponse("Message not valid", { status: 500 });
     }
 
-    let text = message.input || '';
+    let text = message.interactor.fid || '';
     let state = {
         page: 0,
         time: Date.now(),
         _state: "",
     };
 
+    /*
     try {
         state = JSON.parse(decodeURIComponent(message.state?.serialized));
         console.log(state)
     } catch (e) {
         console.log("error parsing")
-    }
+    }*/
 
     text = `${text} - ${state?.page}`
 

@@ -29,7 +29,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
         return new NextResponse("Message not valid", { status: 500 });
     }
 
-    let text = message.interactor.verified_accounts[0] || '';
+    //let text = message.interactor.verified_accounts[0] || '';
     let fid = message.interactor.fid
 
     let user_info = await sdk.userBulk({ fids: fid, api_key: process.env.neynar_api })
@@ -44,49 +44,11 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     // Check if player in fb
     let fbManager = new FBManager(user_info)
     fbManager.init()
-    /*
-    let fb = fbManager.getPlayerInfo()
-    console.log("fb", fb)
-    */
-
-    //let user_path = `players/${fid}`
-    //let playerInfo = await getData(user_path)
-
-    /*
-    if (playerInfo == null) {
-        user_info.joined = Date.now()
-        setData(user_path, user_info)
-    }
-    */
-
-    text = `${fid} - ${user_info.username}`
-
-    text = `${text} - ${state?.page}`
 
     let page = state?.page
 
-    let { isRacing, raceState } = raceInfo
+    let { raceState } = raceInfo
     let playerInfo = await fbManager.isPlayerBetting()
-
-    /*
-    console.log(state?.page)
-    let image = ""
-    switch (state?.page) {
-        case FrameState.Betting:
-            image = `${NEXT_PUBLIC_URL}/bet.png`
-            return getBetFrame("", "", image, state)
-        case FrameState.Adopting:
-            image = `${NEXT_PUBLIC_URL}/home.png`
-            return getBetFrame("", "", image, state)
-        default:
-            break;
-    }
-
-    image = `${NEXT_PUBLIC_URL}/waiting.png`
-    return getBetFrame("", "", image, state)
-    */
-
-    let image = ""
 
     // After First page check race state
     console.log(raceInfo, page)
@@ -120,7 +82,8 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
                 return getRacingFrame("", null, image)
             }
         case "2":
-            return getWaitingFrame(state, raceInfo, text)
+            //return getWaitingFrame(state, raceInfo, text)
+            break
         case "3":
             image = `${NEXT_PUBLIC_URL}/bet.png`
             return getBetFrame(image, state)
@@ -129,7 +92,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
             break;
     }
 
-    //return getBetFrame(state, raceInfo, text)
+    return getBetFrame(`${NEXT_PUBLIC_URL}/home.png`, state)
 }
 
 export async function POST(req: NextRequest): Promise<Response> {

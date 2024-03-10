@@ -38,7 +38,7 @@ export class FBManager {
     }
 
     async getRaceStandings() {
-        let current_race = await getSortedData("current_race", "horse_place", "desc")
+        let current_race = await getSortedData("current_race", "horse_place")
         return current_race
     }
 }

@@ -2,8 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
 import { NEXT_PUBLIC_URL, API_URL, FrameState } from '../config';
 
-export const getRacingFrame = (selectedHorse, horseID, image) => {
-    const searchParams = new URLSearchParams({ racingSelectedHorse: selectedHorse, racingSelectedHorseID: horseID, image })
+const formatStandings = (standings) => {
+    let out = ""
+    standings.map((x) => { out = out.concat('-', x.horse_id) });
+    out = out.slice(1)
+    return out
+}
+
+export const getRacingFrame = (selectedHorse, horseID, image, standings) => {
+    let _standings = formatStandings(standings)
+    const searchParams = new URLSearchParams({ racingSelectedHorse: selectedHorse, racingSelectedHorseID: horseID, image, raceStandings: _standings })
     return new NextResponse(
         getFrameHtmlResponse({
             image: {

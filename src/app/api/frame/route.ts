@@ -73,13 +73,13 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
             break
         case "1": // Racing
             let raceStandings = await fbManager.getRaceStandings()
-            console.log("raceStandings", raceStandings)
+            //console.log("raceStandings", raceStandings)
             let image = `${NEXT_PUBLIC_URL}/racing.png`
             if (playerInfo != null) { //Player placed a bet
                 let horse = horses[playerInfo.bet - 1]
-                return getRacingFrame(horse, playerInfo.bet, image)
+                return getRacingFrame(horse, playerInfo.bet, image, raceStandings)
             } else { //Player did not place a bet
-                return getRacingFrame("", null, image)
+                return getRacingFrame("", null, image, raceStandings)
             }
         case "2":
             //return getWaitingFrame(state, raceInfo, text)

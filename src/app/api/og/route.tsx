@@ -1,25 +1,49 @@
 import { ImageResponse } from 'next/og'
+import { Faster_One } from 'next/font/google'
+const faster_one_font = Faster_One({ weight: '400', subsets: ['latin'] })
+import {API_URL } from '../../config';
+
+
+
 // App router includes @vercel/og.
 // No need to install it.
 
 //export const runtime = 'edge'
 
-function showHorse(horse: any){
+const getFaster = async () => {
+  let font_link = `${API_URL}/FasterOne-Regular.ttf`
+  const response = await fetch(
+     new URL(font_link, import.meta.url)
+   );
+   const faster = await response.arrayBuffer();
+ 
+   return faster;
+ }
+
+function showHorse(horse: any, horseID: any){
+  let horsePhoto = `${API_URL}/${horseID}.png`
+  let photoSize = 150
   if (horse) {
     return (
+      <div style={{display: 'flex',  alignItems: 'center',
+      justifyContent: 'center', flexDirection: "column", marginTop: 150}}>
+         <img src={horsePhoto} style={{height: photoSize, width: photoSize, borderRadius: 30}} />
+      
+    
       <p
     style={{
       backgroundImage:
         'linear-gradient(90deg, rgb(0, 124, 240), rgb(0, 223, 216))',
       backgroundClip: 'text',
       color: 'transparent',
-      fontSize: 80,
+      fontSize: 40,
       fontWeight: 700,
       margin: 0,
     }}
   >
     {horse}
   </p>
+  </div>
     )
   } else {
     return (<></>)
@@ -29,29 +53,15 @@ function showHorse(horse: any){
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    //selectedHorse
     const hasSelectedHorse = searchParams.has('selectedHorse')
     const horse = hasSelectedHorse
       ? searchParams.get('selectedHorse')?.slice(0, 100)
       : ''
-
-    // ?title=<title>
-    /*
-    const hasTitle = searchParams.has('title')
-    const title = hasTitle
-      ? searchParams.get('title')?.slice(0, 100)
-      : 'Default Title'
-
-    // ?description=
-    const hasDescription = searchParams.has('description')
-    const description = hasDescription
-      ? searchParams.get('description')?.slice(0, 100)
+    const hasHorseID = searchParams.has('horseID')
+    const horseID = hasHorseID
+      ? searchParams.get('horseID')?.slice(0, 100)
       : ''
-      */
-
     const image = searchParams.get('image')?.slice(0, 100)
-    //const backgroundImage = searchParams.get('image')?.slice(0, 100)
-    //console.log(backgroundImage, description, title)
 
     return new ImageResponse(
       (
@@ -61,7 +71,7 @@ export async function GET(request: Request) {
             height: '100%',
             width: '100%',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             flexDirection: 'column',
             backgroundImage: `url(${image})`,
             fontSize: 80,
@@ -72,13 +82,21 @@ export async function GET(request: Request) {
           }}
         >
           {
-            showHorse(horse)
+            showHorse(horse, horseID)
           }
         </div>
       ),
       {
         width: 600,
         height: 630,
+        fonts: [
+          {
+            name: 'FasterOne-Regular',
+            data: await getFaster(),
+            style: 'normal',
+            weight: 400,
+          },
+        ],
       }
     )
   } catch (e: any) {

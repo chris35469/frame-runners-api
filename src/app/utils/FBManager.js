@@ -1,4 +1,4 @@
-import { getData, setData } from './firebase'
+import { getData, setData, getSortedData } from './firebase'
 
 export class FBManager {
     constructor(player_info) {
@@ -35,5 +35,10 @@ export class FBManager {
         setData(bet_path, this.player_info)
         // Add players to current bettors
         setData(`current_bets/players/${this.player_info.fid}`, this.player_info)
+    }
+
+    async getRaceStandings() {
+        let current_race = await getSortedData("current_race", "horse_place", "desc")
+        return current_race
     }
 }

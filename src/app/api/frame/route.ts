@@ -66,6 +66,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     let page = state?.page
 
     let { isRacing, raceState } = raceInfo
+    let playerInfo = await fbManager.isPlayerBetting()
 
     /*
     console.log(state?.page)
@@ -88,34 +89,43 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     let image = ""
 
     // After First page check race state
-
+    console.log(raceInfo, page)
     switch (raceState) {
-        case "0":
-            let playerInfo = await fbManager.isPlayerBetting()
-            console.log(playerInfo)
-
-            if (playerInfo != null) {
-                //console.log("player betted.")
-                image = `${NEXT_PUBLIC_URL}/waiting.png`
-                let horse = horses[playerInfo.bet]
-                return getWaitingFrame(horse, image)
-            } else {
+        case "0": // Betting Open
+            let waitingImage = `${NEXT_PUBLIC_URL}/waiting.png`
+            if (playerInfo != null) { //Player already placed a bet
+                //image = `${NEXT_PUBLIC_URL}/waiting.png`
+                let horse = horses[playerInfo.bet - 1]
+                return getWaitingFrame(horse, playerInfo.bet, waitingImage)
+            } else { // Player did not bet
                 if (page == FrameState.Betting) {
                     bet(fbManager, message)
-                    // Send to page telling player what there current bet is
+                    let _input = parseInt(message.input)
+                    let horse = horses[_input - 1]
+                    return getWaitingFrame(horse, _input, waitingImage)
+                } else if (page == FrameState.Init) {
+                    return getBetFrame(`${NEXT_PUBLIC_URL}/bet.png`, state)
                 }
             }
-            image = `${NEXT_PUBLIC_URL}/bet.png`
-            return getBetFrame(image, state)
-        case "1":
-            image = `${NEXT_PUBLIC_URL}/waiting.png`
-            return getBetFrame(image, state)
+
+            break
+        case "1": // Racing
+            let raceStandings = await fbManager.getRaceStandings()
+            console.log("raceStandings", raceStandings)
+            let image = `${NEXT_PUBLIC_URL}/racing.png`
+            if (playerInfo != null) { //Player placed a bet
+                let horse = horses[playerInfo.bet - 1]
+                return getRacingFrame(horse, playerInfo.bet, image)
+            } else { //Player did not place a bet
+                return getRacingFrame("", null, image)
+            }
         case "2":
             return getWaitingFrame(state, raceInfo, text)
         case "3":
             image = `${NEXT_PUBLIC_URL}/bet.png`
             return getBetFrame(image, state)
         default:
+            console.log("reached default state of switch statement")
             break;
     }
 

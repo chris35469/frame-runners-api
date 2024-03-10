@@ -2,18 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FrameRequest, getFrameMessage, getFrameHtmlResponse } from '@coinbase/onchainkit/frame';
 import { NEXT_PUBLIC_URL, API_URL, FrameState } from '../config';
 
-export const getRacingFrame = (state, raceInfo) => {
-    let { isRacing, raceState } = raceInfo
+export const getRacingFrame = (selectedHorse, horseID, image) => {
+    const searchParams = new URLSearchParams({ racingSelectedHorse: selectedHorse, racingSelectedHorseID: horseID, image })
     return new NextResponse(
         getFrameHtmlResponse({
-
             image: {
-                src: `${NEXT_PUBLIC_URL}/racing.png`,
+                src: `${API_URL}/api/og?${searchParams}`,
                 aspectRatio: '1:1',
             },
             buttons: [
                 {
-                    label: `update`,
+                    label: `Update`,
                 },
                 {
                     action: 'link',
@@ -23,11 +22,11 @@ export const getRacingFrame = (state, raceInfo) => {
             ],
             postUrl: `${API_URL}/api/frame`,
             state: {
-                page: state?.page + 1,
+                page: FrameState.Betting,
                 time: Date.now(),
             }
-        }),
-    );
+        })
+    )
 }
 
 export const getBetFrame = (image, state) => {
@@ -56,8 +55,8 @@ export const getBetFrame = (image, state) => {
 }
 
 
-export const getWaitingFrame = (selectedHorse, image) => {
-    const searchParams = new URLSearchParams({ selectedHorse, image })
+export const getWaitingFrame = (selectedHorse, horseID, image) => {
+    const searchParams = new URLSearchParams({ selectedHorse, horseID, image })
     return new NextResponse(
         getFrameHtmlResponse({
             image: {

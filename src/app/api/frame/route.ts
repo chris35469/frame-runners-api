@@ -18,7 +18,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     };
 
     try {
-        state = JSON.parse(decodeURIComponent(message.state?.serialized));
+        if (message) state = JSON.parse(decodeURIComponent(message.state?.serialized));
     } catch (e) {
         //console.error(e);
     }

@@ -20,15 +20,46 @@ const getFaster = async () => {
    return faster;
  }
 
+ function getPoints(standings: any, horseID: any) {
+  let index = standings.indexOf(horseID)
+  switch (index) {
+    case 0:
+      return 10
+    case 1: 
+      return 5
+    case 2:
+      return 2
+    default:
+      return 0
+  }
+ }
+
+ function showYourPick(horseID: any, isResultsPage: any, standings: any){
+  let srcImage = `https://w3bbie.xyz/runners/${horseID}.png`
+  let imageSize = 70
+  let _id = parseInt(horseID) - 1 
+  let points = getPoints(standings, horseID)
+  let pointString = `You Won ${points} Points.`
+  let _isShowingResults = isResultsPage == "true"
+  let point_earned = points > 0
+  console.log("isResultsPage" ,_isShowingResults)
+  return(
+    <div style={{display: 'flex',  alignItems: 'center', justifyContent: 'center', flexDirection: "column", marginTop: 30}}>
+        <p style={{fontSize: 40, marginTop:0, marginBottom:0, padding: 0}}>You Picked:</p>
+        <img src={srcImage} style={{height: imageSize, width: imageSize, borderRadius: 50}} />
+        <p style={{fontSize: 30, marginTop:10, marginBottom:0, padding: 0}}>{horses[_id]}</p>
+        <p style={{fontSize: 30, marginTop:10, marginBottom:0, padding: 0, color: "#24FFB0"}}>{point_earned && _isShowingResults && pointString}</p>
+    </div>
+  )
+ }
+
  function showStandings(standings: any) {
-  console.log(standings)
-  let photoSize = 20
   const listItems = standings.map((id: string, index: any) =>{
-    console.log(NEXT_PUBLIC_URL)
     let srcImage = `https://w3bbie.xyz/runners/${id}.png`
-    return (<div style={{display: 'flex',  alignItems: 'center', justifyContent: 'center', flexDirection: "column"}}>
-      <img src={srcImage} height={"30px"} width={"30px"} />
+    if (index >= 5) return (<></>)
+    return (<div style={{display: 'flex',  alignItems: 'center', justifyContent: 'center', flexDirection: "row"}} key={id}>
       <p style={{fontSize: 35, marginTop:0, marginBottom:0, padding: 0}}>{index+1}. {horses[parseInt(id)-1]}</p>
+      <img src={srcImage} height={"30px"} width={"30px"} style={{borderRadius: 20, marginLeft: 10}} />
     </div>
     )
   }
@@ -49,7 +80,8 @@ function showHorse(horse: any, horseID: any){
     return (
       <div style={{display: 'flex',  alignItems: 'center',
       justifyContent: 'center', flexDirection: "column", marginTop: 150}} >
-         <img src={horsePhoto} style={{height: photoSize, width: photoSize, borderRadius: 30}} />
+         {/*<img src={horsePhoto} style={{height: photoSize, width: photoSize, borderRadius: 30}} />*/}
+         <img src={horsePhoto} height={"150px"} width={"150px"} style={{borderRadius: 30}} />
       <p
     style={{
       backgroundImage:
@@ -85,6 +117,20 @@ export async function GET(request: Request) {
 
     const standings = searchParams.get('raceStandings')?.slice(0, 100).split("-")
 
+    //const selectedHorseID = searchParams.get('racingSelectedHorseID')?.slice(0, 100)
+
+    const hasRacingHorseID = searchParams.has('racingSelectedHorseID')
+    const racingHorseIDSelected = hasRacingHorseID
+      ? searchParams.get('racingSelectedHorseID')?.slice(0, 100)
+      : ''
+
+      const isResultsPage = searchParams.has('isResults')
+      const isResultsPageState = isResultsPage
+        ? searchParams.get('isResults')?.slice(0, 100)
+        : ''
+
+      //console.log("hasSelectedHorse", isResultsPage, hasSelectedHorse, standings, hasRacingHorseID, racingHorseIDSelected)
+
     return new ImageResponse(
       (
         <div
@@ -104,10 +150,14 @@ export async function GET(request: Request) {
           }}
         >
           {
-            showHorse(horse, horseID)
+            hasSelectedHorse && showHorse(horse, horseID)
           }
           {
-            showStandings(standings)
+           standings && showStandings(standings)
+          }
+          
+          {
+            racingHorseIDSelected && showYourPick(racingHorseIDSelected, isResultsPageState, standings)
           }
         </div>
       ),

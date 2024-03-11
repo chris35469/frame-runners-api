@@ -9,9 +9,9 @@ const formatStandings = (standings) => {
     return out
 }
 
-export const getRacingFrame = (selectedHorse, horseID, image, standings) => {
+export const getRacingFrame = (selectedHorse, horseID, image, standings, isResults = false) => {
     let _standings = formatStandings(standings)
-    const searchParams = new URLSearchParams({ racingSelectedHorse: selectedHorse, racingSelectedHorseID: horseID, image, raceStandings: _standings })
+    const searchParams = new URLSearchParams({ racingSelectedHorse: selectedHorse, racingSelectedHorseID: horseID, image, raceStandings: _standings, isResults })
     return new NextResponse(
         getFrameHtmlResponse({
             image: {
@@ -56,6 +56,28 @@ export const getBetFrame = (image, state) => {
             postUrl: `${API_URL}/api/frame`,
             state: {
                 page: FrameState.Betting,
+                time: Date.now(),
+            }
+        })
+    )
+}
+
+export const getLeaderboardFrame = (fid, image) => {
+    const searchParams = new URLSearchParams({ fid, image })
+    return new NextResponse(
+        getFrameHtmlResponse({
+            image: {
+                src: `${API_URL}/api/leaderboard?${searchParams}`,
+                aspectRatio: '1:1',
+            },
+            buttons: [
+                {
+                    label: `Play`,
+                },
+            ],
+            postUrl: `${API_URL}/api/frame`,
+            state: {
+                state: "leaderboard",
                 time: Date.now(),
             }
         })

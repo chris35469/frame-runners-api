@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { NEXT_PUBLIC_URL, API_URL, FrameState, horses } from '../../config';
 import { getData, setData } from '../../utils/firebase'
 import { FBManager } from '../../utils/FBManager'
-import { getBetFrame, getRacingFrame, getWaitingFrame } from '../../utils/frame-response'
+import { getBetFrame, getRacingFrame, getWaitingFrame, getLeaderboardFrame } from '../../utils/frame-response'
 const sdk = require('api')('@neynar/v2.0#2rxv131ltj1id4t');
 
 async function getResponse(req: NextRequest): Promise<NextResponse> {
@@ -19,6 +19,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
 
     try {
         if (message) state = JSON.parse(decodeURIComponent(message.state?.serialized));
+
     } catch (e) {
         //console.error(e);
     }
@@ -45,13 +46,24 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
     let fbManager = new FBManager(user_info)
     fbManager.init()
 
-    let page = state?.page
 
     let { raceState } = raceInfo
     let playerInfo = await fbManager.isPlayerBetting()
+    let raceStandings = await fbManager.getRaceStandings()
+    let page = state?.page
+
+    console.log(page, message)
+
+    if (message.button == 2) {
+        // Go  to leaderboard
+
+        let waitingImage = `${NEXT_PUBLIC_URL}/waiting.png`
+        return getLeaderboardFrame(fid, waitingImage)
+    }
+
 
     // After First page check race state
-    console.log(raceInfo, page)
+    //console.log(raceInfo, page)
     switch (raceState) {
         case "0": // Betting Open
             let waitingImage = `${NEXT_PUBLIC_URL}/waiting.png`
@@ -60,33 +72,35 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
                 let horse = horses[playerInfo.bet - 1]
                 return getWaitingFrame(horse, playerInfo.bet, waitingImage)
             } else { // Player did not bet
-                if (page == FrameState.Betting) {
-                    bet(fbManager, message)
+                let isBetValid = bet(fbManager, message)
+                if (isBetValid) {
                     let _input = parseInt(message.input)
                     let horse = horses[_input - 1]
                     return getWaitingFrame(horse, _input, waitingImage)
-                } else if (page == FrameState.Init) {
+                } else {
                     return getBetFrame(`${NEXT_PUBLIC_URL}/bet.png`, state)
                 }
             }
 
             break
         case "1": // Racing
-            let raceStandings = await fbManager.getRaceStandings()
             //console.log("raceStandings", raceStandings)
             let image = `${NEXT_PUBLIC_URL}/racing.png`
             if (playerInfo != null) { //Player placed a bet
                 let horse = horses[playerInfo.bet - 1]
                 return getRacingFrame(horse, playerInfo.bet, image, raceStandings)
             } else { //Player did not place a bet
-                return getRacingFrame("", null, image, raceStandings)
+                return getRacingFrame("", "", image, raceStandings)
             }
+
         case "2":
-            //return getWaitingFrame(state, raceInfo, text)
-            break
-        case "3":
-            image = `${NEXT_PUBLIC_URL}/bet.png`
-            return getBetFrame(image, state)
+            let result_image = `${NEXT_PUBLIC_URL}/results.png`
+            if (playerInfo != null) { //Player placed a bet
+                let horse = horses[playerInfo.bet - 1]
+                return getRacingFrame(horse, playerInfo.bet, result_image, raceStandings, true)
+            } else { //Player did not place a bet
+                return getRacingFrame("", "", result_image, raceStandings)
+            }
         default:
             console.log("reached default state of switch statement")
             break;
@@ -104,6 +118,22 @@ function bet(fbManager: FBManager, message: any) {
     let valid = _input >= 0 && _input <= 10
     if (valid) {
         fbManager.storeBet(_input)
+        return true
+    }
+    return false
+}
+
+function getPoints(standings: any, horseID: any) {
+    let index = standings.indexOf(horseID)
+    switch (index) {
+        case 0:
+            return 10
+        case 1:
+            return 5
+        case 2:
+            return 2
+        default:
+            return 0
     }
 }
 
